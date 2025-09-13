@@ -1,0 +1,65 @@
+managed implementation in class ZBP_R_CREDIT_BANK unique;
+strict ( 2 );
+with draft;
+extensible;
+define behavior for ZR_CREDIT_BANK alias ZrCreditBank
+early numbering
+persistent table ZCREDIT_BANK
+extensible
+draft table ZCREDIT_BANK_D
+etag master LocalLastChanged
+lock master total etag LastChanged
+authorization master( global )
+
+{
+  //field ( mandatory : create )
+  // CreditNo;
+
+  field ( readonly )
+   CreditNo,
+   LocalLastChanged,
+   LastChanged,
+   CreatedBy,
+   ChangedBy;
+
+  //field ( readonly : update )
+  // CreditNo;
+
+
+  create;
+  update;
+  delete;
+
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Edit;
+  draft action Resume;
+  draft determine action Prepare;
+
+  validation validate_credit on save{
+    field StartYear, CreditSum;
+  }
+
+  action( features: instance ) approve_credit result [1] $self;
+
+  determination set_state on save{
+    create;
+  }
+
+  mapping for ZCREDIT_BANK corresponding extensible
+  {
+    CreditNo = credit_no;
+    StartYear = start_year;
+    CreditSum = credit_sum;
+    MonthlyRepayRate = monthly_repay_rate;
+    Tribute = tribute;
+    State = state;
+    CurrencyCode = currency_code;
+    Borrower = borrower;
+    LocalLastChanged = local_last_changed;
+    LastChanged = last_changed;
+    CreatedBy = created_by;
+    ChangedBy = changed_by;
+  }
+
+}

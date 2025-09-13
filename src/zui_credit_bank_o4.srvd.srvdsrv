@@ -1,0 +1,11 @@
+@EndUserText: {
+  label: 'Service Definition for ZC_CREDIT_BANK'
+}
+@ObjectModel: {
+  leadingEntity: {
+    name: 'ZC_CREDIT_BANK'
+  }
+}
+define service ZUI_CREDIT_BANK_O4 provider contracts odata_v4_ui {
+  expose ZC_CREDIT_BANK;
+}

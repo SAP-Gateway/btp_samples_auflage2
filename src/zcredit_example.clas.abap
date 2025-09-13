@@ -1,0 +1,24 @@
+CLASS zcredit_example DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+
+    INTERFACES if_oo_adt_classrun.
+
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS ZCREDIT_EXAMPLE IMPLEMENTATION.
+
+
+  METHOD if_oo_adt_classrun~main.
+
+    UPDATE zcredit_bank SET state = '1'.
+
+  ENDMETHOD.
+ENDCLASS.
