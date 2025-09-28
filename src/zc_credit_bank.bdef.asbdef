@@ -18,5 +18,6 @@ use etag
   use action Resume;
   use action Prepare;
   use action approve_credit;
+  use action deny_credit;
 
 }

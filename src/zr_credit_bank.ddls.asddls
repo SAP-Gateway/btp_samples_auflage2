@@ -3,7 +3,7 @@
 @EndUserText.label: '###GENERATED Core Data Service Entity'
 @ObjectModel.sapObjectNodeType.name: 'ZCREDIT_BANK'
 define root view entity ZR_CREDIT_BANK
-  as select from ZCREDIT_BANK
+  as select from zcredit_bank
 {
   key credit_no as CreditNo,
   start_year as StartYear,
@@ -13,6 +13,7 @@ define root view entity ZR_CREDIT_BANK
   monthly_repay_rate as MonthlyRepayRate,
   tribute as Tribute,
   state as State,
+  deny_reason as DenyReason,
   @Consumption.valueHelpDefinition: [ {
     entity.name: 'I_CurrencyStdVH', 
     entity.element: 'Currency', 

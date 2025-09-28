@@ -78,6 +78,7 @@ annotate view ZC_CREDIT_BANK with
   } ]
   State;
   
+  
   @UI.identification: [ {
     position: 70 
   } ]
@@ -87,13 +88,16 @@ annotate view ZC_CREDIT_BANK with
   @UI.selectionField: [ {
     position: 70 
   } ]
+  @Consumption.valueHelpDefinition: [ {
+    entity: { name: 'ZCREDIT_CUSTOMER_VH', element: 'borrower_no' }
+  } ]
   Borrower;
   
   @UI.identification: [ {
     position: 80 
   } ]
   @UI.lineItem: [ {
-    position: 60,
+    position: 80,
     type: #FOR_ACTION,
     dataAction: 'approve_credit',
     label: 'Genehmigen'
@@ -107,7 +111,10 @@ annotate view ZC_CREDIT_BANK with
     position: 90 
   } ]
   @UI.lineItem: [ {
-    position: 90 
+    position: 60,
+    type: #FOR_ACTION,
+    dataAction: 'deny_credit',
+    label: 'Ablehnen'
   } ]
   @UI.selectionField: [ {
     position: 90 

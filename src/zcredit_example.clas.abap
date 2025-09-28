@@ -18,7 +18,7 @@ CLASS ZCREDIT_EXAMPLE IMPLEMENTATION.
 
   METHOD if_oo_adt_classrun~main.
 
-    UPDATE zcredit_bank SET state = '1'.
+    UPDATE zcredit_bank set state = '1' where credit_no = '0000000006'.
 
   ENDMETHOD.
 ENDCLASS.

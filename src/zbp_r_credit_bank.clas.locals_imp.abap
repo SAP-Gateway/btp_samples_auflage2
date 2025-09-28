@@ -1,9 +1,9 @@
-CLASS LHC_ZR_CREDIT_BANK DEFINITION INHERITING FROM CL_ABAP_BEHAVIOR_HANDLER.
+CLASS lhc_zr_credit_bank DEFINITION INHERITING FROM cl_abap_behavior_handler.
   PRIVATE SECTION.
     METHODS:
-      GET_GLOBAL_AUTHORIZATIONS FOR GLOBAL AUTHORIZATION
+      get_global_authorizations FOR GLOBAL AUTHORIZATION
         IMPORTING
-           REQUEST requested_authorizations FOR ZrCreditBank
+        REQUEST requested_authorizations FOR ZrCreditBank
         RESULT result,
       early_numbering_create FOR NUMBERING
         IMPORTING
@@ -18,19 +18,23 @@ CLASS LHC_ZR_CREDIT_BANK DEFINITION INHERITING FROM CL_ABAP_BEHAVIOR_HANDLER.
           zcx_credit,
       approve_credit FOR MODIFY
         IMPORTING
-          keys FOR ACTION ZrCreditBank~approve_credit
-        RESULT result,
+                  keys   FOR ACTION ZrCreditBank~approve_credit
+        RESULT    result,
+      deny_credit FOR MODIFY
+        IMPORTING
+                  keys   FOR ACTION ZrCreditBank~deny_credit
+        RESULT    result,
       get_features FOR INSTANCE FEATURES
         IMPORTING
-          keys REQUEST requested_features FOR ZrCreditBank
-        RESULT result,
+                  keys   REQUEST requested_features FOR ZrCreditBank
+        RESULT    result,
       set_state FOR DETERMINE ON SAVE
         IMPORTING
           keys FOR ZrCreditBank~set_state.
 ENDCLASS.
 
-CLASS LHC_ZR_CREDIT_BANK IMPLEMENTATION.
-  METHOD GET_GLOBAL_AUTHORIZATIONS.
+CLASS lhc_zr_credit_bank IMPLEMENTATION.
+  METHOD get_global_authorizations.
   ENDMETHOD.
 
   METHOD early_numbering_create.
@@ -59,7 +63,7 @@ CLASS LHC_ZR_CREDIT_BANK IMPLEMENTATION.
 
   METHOD validate_credit.
 
-    READ ENTITIES OF ZR_CREDIT_BANK IN LOCAL MODE
+    READ ENTITIES OF zr_credit_bank IN LOCAL MODE
       ENTITY ZrCreditBank
       FIELDS ( StartYear CreditSum )
       WITH CORRESPONDING #( keys )
@@ -102,9 +106,10 @@ CLASS LHC_ZR_CREDIT_BANK IMPLEMENTATION.
 
   METHOD get_features.
     CONSTANTS:
-      state_new TYPE zrc_booking_state VALUE '1'.
+      state_new    TYPE zcredit_state VALUE '1',
+      state_denied TYPE zcredit_state VALUE '4'.
 
-    READ ENTITIES OF ZR_CREDIT_BANK IN LOCAL MODE
+    READ ENTITIES OF zr_credit_bank IN LOCAL MODE
       ENTITY ZrCreditBank
       FIELDS ( state )
       WITH CORRESPONDING #( keys )
@@ -115,7 +120,19 @@ CLASS LHC_ZR_CREDIT_BANK IMPLEMENTATION.
         %features-%action-approve_credit = COND #(
          WHEN <credit>-state = state_new OR <credit>-state IS INITIAL
          THEN if_abap_behv=>fc-o-enabled
-         ELSE if_abap_behv=>fc-o-disabled ) ) ).
+         ELSE if_abap_behv=>fc-o-disabled )
+       %features-%action-deny_credit = COND #(
+         WHEN <credit>-state = state_new OR <credit>-state IS INITIAL
+         THEN if_abap_behv=>fc-o-enabled
+         ELSE if_abap_behv=>fc-o-disabled )
+        %features-%delete = COND #(
+         WHEN <credit>-state = state_new OR <credit>-state IS INITIAL
+         THEN if_abap_behv=>fc-o-enabled
+         ELSE if_abap_behv=>fc-o-disabled )
+        %features-%update = COND #(
+         WHEN <credit>-state = state_denied
+         THEN if_abap_behv=>fc-o-disabled
+         ELSE if_abap_behv=>fc-o-enabled ) ) ).
 
   ENDMETHOD.
 
@@ -123,7 +140,7 @@ CLASS LHC_ZR_CREDIT_BANK IMPLEMENTATION.
     CONSTANTS:
       state_approved TYPE zcredit_state VALUE '2'.
 
-    MODIFY ENTITIES OF ZR_CREDIT_BANK IN LOCAL MODE
+    MODIFY ENTITIES OF zr_credit_bank IN LOCAL MODE
       ENTITY ZrCreditBank
       UPDATE FROM VALUE #(
         FOR <key> IN keys
@@ -131,16 +148,43 @@ CLASS LHC_ZR_CREDIT_BANK IMPLEMENTATION.
           state = state_approved
           %control-state = if_abap_behv=>mk-on ) ).
 
-    READ ENTITIES OF ZR_CREDIT_BANK IN LOCAL MODE
+    READ ENTITIES OF zr_credit_bank IN LOCAL MODE
       ENTITY ZrCreditBank
       ALL FIELDS
       WITH CORRESPONDING #( keys )
       RESULT DATA(credits).
 
-     result = VALUE #(
-       FOR <credit> IN credits
-       ( %tky = <credit>-%tky
-         %param = <credit> ) ).
+    result = VALUE #(
+      FOR <credit> IN credits
+      ( %tky = <credit>-%tky
+        %param = <credit> ) ).
+
+  ENDMETHOD.
+
+  METHOD deny_credit.
+    CONSTANTS:
+      state_denied TYPE zcredit_state VALUE '4'.
+
+    MODIFY ENTITIES OF zr_credit_bank IN LOCAL MODE
+      ENTITY ZrCreditBank
+      UPDATE FROM VALUE #(
+        FOR <key> IN keys
+        ( creditno = <key>-creditno
+          state = state_denied
+          denyreason = <key>-%param-denyreason
+          %control-state = if_abap_behv=>mk-on
+          %control-denyreason = if_abap_behv=>mk-on ) ).
+
+    READ ENTITIES OF zr_credit_bank IN LOCAL MODE
+      ENTITY ZrCreditBank
+      ALL FIELDS
+      WITH CORRESPONDING #( keys )
+      RESULT DATA(credits).
+
+    result = VALUE #(
+      FOR <credit> IN credits
+      ( %tky = <credit>-%tky
+        %param = <credit> ) ).
 
   ENDMETHOD.
 
@@ -148,7 +192,7 @@ CLASS LHC_ZR_CREDIT_BANK IMPLEMENTATION.
     CONSTANTS:
       state_new TYPE zcredit_state VALUE '1'.
 
-    MODIFY ENTITIES OF ZR_CREDIT_BANK IN LOCAL MODE
+    MODIFY ENTITIES OF zr_credit_bank IN LOCAL MODE
       ENTITY ZrCreditBank
       UPDATE FROM VALUE #(
         FOR <key> IN keys

@@ -17,6 +17,7 @@ authorization master( global )
 
   field ( readonly )
    CreditNo,
+   State,
    LocalLastChanged,
    LastChanged,
    CreatedBy,
@@ -27,8 +28,8 @@ authorization master( global )
 
 
   create;
-  update;
-  delete;
+  update( features : instance );
+  delete( features : instance );
 
   draft action Activate optimized;
   draft action Discard;
@@ -41,6 +42,7 @@ authorization master( global )
   }
 
   action( features: instance ) approve_credit result [1] $self;
+  action( features: instance ) deny_credit parameter zcredit_deny_reason_s result [1] $self;
 
   determination set_state on save{
     create;
@@ -54,6 +56,7 @@ authorization master( global )
     MonthlyRepayRate = monthly_repay_rate;
     Tribute = tribute;
     State = state;
+    DenyReason = deny_reason;
     CurrencyCode = currency_code;
     Borrower = borrower;
     LocalLastChanged = local_last_changed;
